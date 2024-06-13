@@ -108,6 +108,7 @@ import SwiftUI
 			}
 		}
 	}
+	#if !os(watchOS) && !os(tvOS)
 	.safeAreaInset(edge: .bottom) {
 		Form {
 			LabeledContent {
@@ -130,5 +131,6 @@ import SwiftUI
 		.scrollContentBackground(.hidden)
 		.background(.thinMaterial)
 	}
+	#endif
 }
 
