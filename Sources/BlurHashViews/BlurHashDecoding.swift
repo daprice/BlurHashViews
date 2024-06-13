@@ -1,4 +1,4 @@
-// Based on https://github.com/woltapp/blurhash by Wolt Enterprises, modified by Dale Price
+// Based on portions of https://github.com/woltapp/blurhash by Wolt Enterprises, modified by Dale Price
 //
 // Copyright (c) 2018 Wolt Enterprises
 //
