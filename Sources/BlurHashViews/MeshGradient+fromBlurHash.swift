@@ -41,7 +41,7 @@ extension MeshGradient {
 		
 		/// Create a Mesh by decoding a BlurHash string.
 		///
-		/// You only need to call this yourself if you want to cache the results of BlurHash decoding (this method is somewhat costly) or you want to customize the colors or points. Otherwise, you can call ``SwiftUICore/MeshGradient/init(_:background:smoothsColors:colorSpace:)`` directly.
+		/// You only need to call this yourself if you want to cache the results of BlurHash decoding (this method is somewhat costly) or you want to customize the colors or points. Otherwise, you can call ``SwiftUICore/MeshGradient/init(fromBlurHash:punch:detail:smoothsColors:colorSpace:)`` directly.
 		///
 		/// Returns `nil` if the BlurHash string is invalid.
 		///
