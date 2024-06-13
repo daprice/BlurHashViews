@@ -9,6 +9,8 @@ import SwiftUI
 
 public extension Color {
 	/// Create a `Color` from the average color in a BlurHash.
+	///
+	/// Returns `nil` if the BlurHash string is invalid.
 	init?(averageFromBlurHash blurHash: String) {
 		guard blurHash.count >= 6 else { return nil }
 		let value = String(blurHash[2 ..< 6]).decode83()

@@ -77,8 +77,8 @@ import SwiftUI
 		Grid {
 			GridRow {
 				Text("Average color")
-				Text("MeshGradient")
 				Text("Simple MeshGradient")
+				Text("MeshGradient")
 			}
 			.font(.caption)
 			
@@ -90,7 +90,7 @@ import SwiftUI
 					MeshGradient(
 						fromBlurHash: hash,
 						punch: punch,
-						detail: .standard,
+						detail: .simple,
 						smoothsColors: smoothColors,
 						colorSpace: colorSpace
 					)
@@ -99,7 +99,7 @@ import SwiftUI
 					MeshGradient(
 						fromBlurHash: hash,
 						punch: punch,
-						detail: .simple,
+						detail: .unchanged,
 						smoothsColors: smoothColors,
 						colorSpace: colorSpace
 					)
