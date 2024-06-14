@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Foundation
+import simd
 
 internal func decodeDC(_ value: Int) -> SIMD3<Float> {
 	let intR = value >> 16
@@ -30,19 +31,17 @@ internal func decodeDC(_ value: Int) -> SIMD3<Float> {
 }
 
 internal func decodeAC(_ value: Int, maximumValue: Float) -> SIMD3<Float> {
-	let quantR = value / (19 * 19)
-	let quantG = (value / 19) % 19
-	let quantB = value % 19
+	let quant: SIMD3<Float> = [
+		Float(value / (19 * 19)),
+		Float((value / 19) % 19),
+		Float(value % 19)
+	]
 	
-	return SIMD3(
-		signPow((Float(quantR) - 9) / 9, 2),
-		signPow((Float(quantG) - 9) / 9, 2),
-		signPow((Float(quantB) - 9) / 9, 2)
-	) * maximumValue
+	return signSquared((quant - 9.0) / 9.0) * maximumValue
 }
 
-internal func signPow(_ value: Float, _ exp: Float) -> Float {
-	return copysign(pow(abs(value), exp), value)
+internal func signSquared(_ value: SIMD3<Float>) -> SIMD3<Float> {
+	return sign(value) * value * value
 }
 
 fileprivate func sRGBToLinear<Type: BinaryInteger>(_ value: Type) -> Float {
