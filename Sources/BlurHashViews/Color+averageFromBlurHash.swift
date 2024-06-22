@@ -12,8 +12,9 @@ public extension Color {
 	///
 	/// Returns `nil` if the BlurHash string is invalid.
 	init?(averageFromBlurHash blurHash: String) {
-		guard blurHash.count >= 6 else { return nil }
-		let value = String(blurHash[2 ..< 6]).decode83()
+		var substring = blurHash.utf8.dropFirst(2)
+		guard let value = try? decode83(numCharacters: 4, from: &substring) else { return nil }
+
 		let rgb = decodeDC(value)
 		self.init(.sRGBLinear, red: Double(rgb.x), green: Double(rgb.y), blue: Double(rgb.z))
 	}

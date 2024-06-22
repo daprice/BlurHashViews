@@ -52,40 +52,61 @@ extension MeshGradient {
 		public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: DetailLevel = .unchanged) {
 			typealias Point = SIMD2<Float>
 			
-			guard blurHash.count >= 6 else { return nil }
-			
-			let sizeFlag = String(blurHash[0]).decode83()
-			let numY = (sizeFlag / 9) + 1
-			let numX = (sizeFlag % 9) + 1
-			
+			var rawColors: [SIMD3<Float>] = []
+			let numY: Int
+			let numX: Int
+
 			let yPoints: Int
 			let xPoints: Int
-			switch detail {
-			case .unchanged:
-				yPoints = numY
-				xPoints = numX
-			case .vertices(let width, let height):
-				yPoints = height
-				xPoints = width
-			}
-			
-			let quantisedMaximumValue = String(blurHash[1]).decode83()
-			let maximumValue = Float(quantisedMaximumValue + 1) / 166
-			
-			guard blurHash.count == 4 + 2 * numX * numY else { return nil }
-			
-			let rawColors: [SIMD3<Float>] = (0 ..< numX * numY).map { i in
-				if i == 0 {
-					let value = String(blurHash[2 ..< 6]).decode83()
-					return decodeDC(value)
-				} else {
-					let value = String(blurHash[4 + i * 2 ..< 4 + i * 2 + 2]).decode83()
-					return decodeAC(value, maximumValue: maximumValue * punch)
+
+			do {
+				var substring = blurHash.utf8[...]
+
+				let sizeFlag = try decode83(numCharacters: 1, from: &substring)
+				numY = (sizeFlag / 9) + 1
+				numX = (sizeFlag % 9) + 1
+
+				switch detail {
+				case .unchanged:
+					yPoints = numY
+					xPoints = numX
+				case .vertices(let width, let height):
+					yPoints = height
+					xPoints = width
 				}
+
+				let quantisedMaximumValue = try decode83(numCharacters: 1, from: &substring)
+				let maximumValue = Float(quantisedMaximumValue + 1) / 166
+
+				let numColors = numX * numY
+				rawColors.reserveCapacity(numColors)
+
+				let dcValue = try decode83(numCharacters: 4, from: &substring)
+				rawColors.append(decodeDC(dcValue))
+
+				for _ in 0 ..< numColors - 1 {
+					let value = try decode83(numCharacters: 2, from: &substring)
+					rawColors.append(decodeAC(value, maximumValue: maximumValue * punch))
+				}
+
+				/// The entire blur hash should be consumed
+				guard substring.isEmpty else { throw ParsingError() }
+			} catch {
+				return nil
 			}
-			
-			let colors: [Color] = (0 ..< yPoints).flatMap { y in
-				(0 ..< xPoints).map { x in
+
+			let numPoints = yPoints * xPoints
+
+			var points: [Point] = []
+			points.reserveCapacity(numPoints)
+
+			var colors: [Color] = []
+			colors.reserveCapacity(numPoints)
+
+			for y in 0 ..< yPoints {
+				for x in 0 ..< xPoints {
+					points.append(SIMD2(x: Float(x) / Float(xPoints - 1), y: Float(y) / Float(yPoints - 1)))
+
 					var rgb = SIMD3<Float>(0.0, 0.0, 0.0)
 					
 					for j in 0 ..< numY {
@@ -97,13 +118,7 @@ extension MeshGradient {
 						}
 					}
 					
-					return Color(.sRGBLinear, red: Double(rgb.x), green: Double(rgb.y), blue: Double(rgb.z))
-				}
-			}
-			
-			let points: [Point] = (0 ..< yPoints).flatMap { y in
-				(0 ..< xPoints).map { x in
-					SIMD2(x: Float(x) / Float(xPoints - 1), y: Float(y) / Float(yPoints - 1))
+					colors.append(Color(.sRGBLinear, red: Double(rgb.x), green: Double(rgb.y), blue: Double(rgb.z)))
 				}
 			}
 			
