@@ -77,16 +77,30 @@ import SwiftUI
 		Grid {
 			GridRow {
 				Text("Average color")
+				Text("Palette")
 				Text("Simple MeshGradient")
 				Text("MeshGradient")
-				Text("Palette")
 			}
 			.font(.caption)
 			
 			ForEach(hashes, id: \.self) { hash in
 				GridRow {
+					let unchangedMesh = MeshGradient.Mesh(
+						fromBlurHash: hash,
+						punch: punch,
+						detail: .unchanged
+					)!
+					
 					Color(averageFromBlurHash: hash)!
 						.aspectRatio(1, contentMode: .fill)
+					
+					HStack(spacing: 0) {
+						let palette = try! unchangedMesh.getPalette(count: 3, resolvingColorsIn: EnvironmentValues())
+						ForEach(palette, id: \.self) { color in
+							Rectangle()
+								.fill(color)
+						}
+					}
 					
 					MeshGradient(
 						fromBlurHash: hash,
@@ -97,25 +111,12 @@ import SwiftUI
 					)
 					.aspectRatio(1, contentMode: .fill)
 					
-					let unchangedMesh = MeshGradient.Mesh(
-						fromBlurHash: hash,
-						punch: punch,
-						detail: .unchanged
-					)!
 					MeshGradient(
 						unchangedMesh,
 						smoothsColors: smoothColors,
 						colorSpace: colorSpace
 					)
 					.aspectRatio(1, contentMode: .fill)
-					
-					HStack(spacing: 0) {
-						let palette = try! unchangedMesh.getPalette(count: 3, resolvingColorsIn: EnvironmentValues())
-						ForEach(palette, id: \.self) { color in
-							Rectangle()
-								.fill(color)
-						}
-					}
 				}
 			}
 		}
