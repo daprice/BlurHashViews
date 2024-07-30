@@ -1,0 +1,15 @@
+{
+  "originHash" : "7c1b1bb64539f2a6a8e6d951265de5a8f31d63649f908aa9f3da992e613a1a4b",
+  "pins" : [
+    {
+      "identity" : "swiftkmeansplusplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daprice/SwiftKMeansPlusPlus.git",
+      "state" : {
+        "revision" : "54ee67ecabec7155384ab7a3c9ef2274c5441eb8",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
