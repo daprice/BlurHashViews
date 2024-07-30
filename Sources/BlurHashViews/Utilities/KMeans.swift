@@ -48,7 +48,7 @@ extension Collection where Element: SIMD, Element.Scalar: BinaryFloatingPoint, E
 		return centers
 	}
 	
-	func kMeansClusters(upTo maxClusterCount: Int, convergeDistance: Element.Scalar) -> [Cluster] {
+	func kMeansClusters(upTo maxClusterCount: Int, convergeDistanceSquared: Element.Scalar) -> [Cluster] {
 		// Randomly select initial centers
 //		var centers = randomElements(count: maxClusterCount)
 		
@@ -78,7 +78,7 @@ extension Collection where Element: SIMD, Element.Scalar: BinaryFloatingPoint, E
 			}
 			
 			centers = newCenters
-		} while moveDistanceSquared > convergeDistance * convergeDistance
+		} while moveDistanceSquared > convergeDistanceSquared
 		
 		return centers.enumerated().map { Cluster($0.element, clusters[$0.offset]) }
 	}

@@ -22,14 +22,14 @@ extension [Color.Resolved] {
 			return []
 		}
 		
-		let totalDistance = (maxRed - minRed) + (maxGreen - minGreen) + (maxBlue - minBlue) + (maxAlpha - minAlpha)
-		guard totalDistance > 0 else {
+		let totalDistanceSquared = pow(maxRed - minRed, 2) + pow(maxGreen - minGreen, 2) + pow(maxBlue - minBlue, 2) + pow(maxAlpha - minAlpha, 2)
+		guard totalDistanceSquared > 0 else {
 			// All colors are equal, return the array as-is, limited by count
 			return .init(self.prefix(count))
 		}
 		
 		let colorVectors = map { SIMD4($0.red, $0.green, $0.blue, $0.opacity) }
-		let clusters = colorVectors.kMeansClusters(upTo: count, convergeDistance: totalDistance / 40)
+		let clusters = colorVectors.kMeansClusters(upTo: count, convergeDistanceSquared: totalDistanceSquared / 100)
 		
 		return clusters.sorted(by: { $0.points.count > $1.points.count }).map {
 			Color.Resolved(colorSpace: .sRGB, red: $0.center.x, green: $0.center.y, blue: $0.center.z, opacity: $0.center.w)
