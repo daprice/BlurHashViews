@@ -49,9 +49,6 @@ extension Collection where Element: SIMD, Element.Scalar: BinaryFloatingPoint, E
 	}
 	
 	func kMeansClusters(upTo maxClusterCount: Int, convergeDistanceSquared: Element.Scalar) -> [Cluster] {
-		// Randomly select initial centers
-//		var centers = randomElements(count: maxClusterCount)
-		
 		// Select initial centers according to K-means++
 		var centers = initialClusterCenters(upTo: maxClusterCount)
 		
@@ -134,22 +131,6 @@ extension Collection {
 		repeat {
 			guard let (index, _) = remainingIndicesAndWeights.map({ ($0.key, $0.value) }).randomElement(weight: \.1) else { return result }
 			remainingIndicesAndWeights.removeValue(forKey: index)
-			result.append(self[index])
-		} while result.count < sampleCount
-		return result
-	}
-}
-
-extension Collection {
-	func randomElements(count sampleCount: Int) -> [Self.Element] where Self.Index: Hashable {
-		guard sampleCount < count else { return .init(self) }
-		
-		var remainingIndices = Set<Index>(self.indices)
-		var result: [Self.Element] = []
-		result.reserveCapacity(sampleCount)
-		repeat {
-			guard let index = remainingIndices.randomElement() else { return result }
-			remainingIndices.remove(index)
 			result.append(self[index])
 		} while result.count < sampleCount
 		return result

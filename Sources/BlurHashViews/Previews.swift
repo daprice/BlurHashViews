@@ -110,7 +110,7 @@ import SwiftUI
 					.aspectRatio(1, contentMode: .fill)
 					
 					HStack(spacing: 0) {
-						let palette = try! unchangedMesh.getPalette(count: 5, resolvingColorsIn: EnvironmentValues())
+						let palette = try! unchangedMesh.getPalette(count: 3, resolvingColorsIn: EnvironmentValues())
 						ForEach(palette, id: \.self) { color in
 							Rectangle()
 								.fill(color)

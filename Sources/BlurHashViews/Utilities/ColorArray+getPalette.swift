@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+// TODO: WIP - optionally include x and y positions within mesh as input to the k-means algorithm
+
 @available(iOS 17.0, *)
 @available(iOS 17, tvOS 17, visionOS 1, macOS 14, watchOS 10, macCatalyst 13, *)
 extension [Color.Resolved] {
-	func getPalette(count: Int = 4) -> [Color.Resolved] {
+	func getPalette(count resultCount: Int = 4) -> [Color.Resolved] {
 		guard let minRed = self.min(by: { $0.red < $1.red })?.red,
 			  let maxRed = self.max(by: { $0.red < $1.red })?.red,
 			  let minGreen = self.min(by: { $0.green < $1.green })?.green,
@@ -25,14 +27,18 @@ extension [Color.Resolved] {
 		let totalDistanceSquared = pow(maxRed - minRed, 2) + pow(maxGreen - minGreen, 2) + pow(maxBlue - minBlue, 2) + pow(maxAlpha - minAlpha, 2)
 		guard totalDistanceSquared > 0 else {
 			// All colors are equal, return the array as-is, limited by count
-			return .init(self.prefix(count))
+			return .init(self.prefix(resultCount))
 		}
 		
-		let colorVectors = map { SIMD4($0.red, $0.green, $0.blue, $0.opacity) }
-		let clusters = colorVectors.kMeansClusters(upTo: count, convergeDistanceSquared: totalDistanceSquared / 100)
+		let colorVectors = map { color in
+			return SIMD4(color.linearRed, color.linearGreen, color.linearBlue, color.opacity)
+		}
+		let clusters = colorVectors.kMeansClusters(upTo: resultCount, convergeDistanceSquared: totalDistanceSquared / 100)
 		
-		return clusters.sorted(by: { $0.points.count > $1.points.count }).map {
-			Color.Resolved(colorSpace: .sRGB, red: $0.center.x, green: $0.center.y, blue: $0.center.z, opacity: $0.center.w)
+		return clusters.sorted(by: { $0.points.count > $1.points.count }).map { cluster in
+			let closestColorToCenter = cluster.points.min(by: { distance_squared($0, cluster.center) < distance_squared($1, cluster.center) }) ?? cluster.center
+//			let closestColorToCenter = cluster.center
+			return Color.Resolved(colorSpace: .sRGBLinear, red: closestColorToCenter[0], green: closestColorToCenter[1], blue: closestColorToCenter[2], opacity: closestColorToCenter[3])
 		}
 	}
 }
