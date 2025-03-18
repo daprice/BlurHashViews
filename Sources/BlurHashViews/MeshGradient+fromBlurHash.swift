@@ -20,7 +20,7 @@ extension MeshGradient {
 			/// Higher numbers of vertices take longer to decode.
 			case vertices(width: Int, height: Int)
 			/// Produces a simple mesh gradient with one color at each corner.
-			static let simple: DetailLevel = .vertices(width: 2, height: 2)
+			public static let simple: DetailLevel = .vertices(width: 2, height: 2)
 		}
 		
 		/// The number of vertices along the X axis.
