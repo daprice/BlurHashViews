@@ -7,21 +7,26 @@
 
 import SwiftUI
 
+public enum BlurHashParsingDetailLevel: Hashable, Codable, Sendable, Equatable {
+	/// Match the number of components originally encoded in the BlurHash.
+	case unchanged
+	
+	/// Define a number of vertices to calculate along the X and Y dimensions.
+	///
+	/// Higher numbers of vertices take longer to decode.
+	case vertices(width: Int, height: Int)
+	
+	/// Produces a simple mesh gradient with one color at each corner.
+	public static let simple: BlurHashParsingDetailLevel = .vertices(width: 2, height: 2)
+}
+
 @available(iOS 18, tvOS 18, visionOS 2, macOS 15, watchOS 11, macCatalyst 13, *)
 extension MeshGradient {
 	
 	/// Stores the colors and points for creating a `MeshGradient`.
 	public struct Mesh: Equatable, Sendable {
-		public enum DetailLevel: Hashable, Codable, Sendable, Equatable {
-			/// Match the number of components originally encoded in the BlurHash.
-			case unchanged
-			/// Define a number of vertices to calculate along the X and Y dimensions.
-			///
-			/// Higher numbers of vertices take longer to decode.
-			case vertices(width: Int, height: Int)
-			/// Produces a simple mesh gradient with one color at each corner.
-			static let simple: DetailLevel = .vertices(width: 2, height: 2)
-		}
+		@available(*, deprecated, renamed: "BlurHashParsingDetailLevel", message: "MeshGradient.Mesh.DetailLevel has been moved to BlurHashParsingDetailLevel.")
+		public typealias DetailLevel = BlurHashParsingDetailLevel
 		
 		/// The number of vertices along the X axis.
 		public var width: Int
@@ -49,7 +54,7 @@ extension MeshGradient {
 		///   - blurHash: The BlurHash string to create a Mesh from.
 		///   - punch: Adjusts the contrast if the decoded colors. See the [BlurHash documentation](https://github.com/woltapp/blurhash#what-is-the-punch-parameter-in-some-of-these-implementations) for an explanation.
 		///   - detail: The level of detail to decode from the BlurHash.
-		public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: DetailLevel = .unchanged) {
+		public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: BlurHashParsingDetailLevel = .unchanged) {
 			typealias Point = SIMD2<Float>
 			
 			var rawColors: [SIMD3<Float>] = []
@@ -157,7 +162,7 @@ extension MeshGradient {
 	///   - detail: The level of detail to decode from the BlurHash.
 	///   - smoothsColors: Whether cubic interpolation should be used for the colors in the mesh.
 	///   - colorSpace: The color space in which to interpolate vertex colors.
-	public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: Mesh.DetailLevel = .unchanged, smoothsColors: Bool = true, colorSpace: Gradient.ColorSpace = .perceptual) {
+	public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: BlurHashParsingDetailLevel = .unchanged, smoothsColors: Bool = true, colorSpace: Gradient.ColorSpace = .perceptual) {
 		guard let mesh = Mesh(fromBlurHash: blurHash, punch: punch, detail: detail) else {
 			return nil
 		}
