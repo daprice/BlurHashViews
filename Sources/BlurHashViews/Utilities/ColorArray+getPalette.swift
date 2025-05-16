@@ -36,11 +36,13 @@ extension [Color.Resolved] {
 		}
 		let clusters = colorVectors.kMeansClusters(upTo: resultCount, convergeDistance: totalDistance / 100, using: &generator)
 		
-		return clusters.sorted(by: { $0.points.count > $1.points.count }).map { cluster in
-			let closestColorToCenter = cluster.points.min(by: { distanceSquared($0, cluster.center) < distanceSquared($1, cluster.center) }) ?? cluster.center
-//			let closestColorToCenter = cluster.center
-			return Color.Resolved(colorSpace: .sRGBLinear, red: closestColorToCenter[0], green: closestColorToCenter[1], blue: closestColorToCenter[2], opacity: closestColorToCenter[3])
-		}
+		return clusters
+			.sorted(by: { $0.points.count == $1.points.count ? $0.center.sum() > $1.center.sum() : $0.points.count > $1.points.count })
+			.map { cluster in
+				let closestColorToCenter = cluster.points.min(by: { distanceSquared($0, cluster.center) < distanceSquared($1, cluster.center) }) ?? cluster.center
+	//			let closestColorToCenter = cluster.center
+				return Color.Resolved(colorSpace: .sRGBLinear, red: closestColorToCenter[0], green: closestColorToCenter[1], blue: closestColorToCenter[2], opacity: closestColorToCenter[3])
+			}
 	}
 	
 	func getPalette(count resultCount: Int = 4) -> [Color.Resolved] {
