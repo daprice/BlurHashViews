@@ -12,7 +12,7 @@ import simd
 @available(iOS 17.0, *)
 @available(iOS 17, tvOS 17, visionOS 1, macOS 14, watchOS 10, macCatalyst 13, *)
 extension [Color.Resolved] {
-	func getPalette(count resultCount: Int = 4) -> [Color.Resolved] {
+	func getPalette<R: RandomNumberGenerator>(count resultCount: Int = 4, using generator: inout R) -> [Color.Resolved] {
 		guard let minRed = self.min(by: { $0.red < $1.red })?.red,
 			  let maxRed = self.max(by: { $0.red < $1.red })?.red,
 			  let minGreen = self.min(by: { $0.green < $1.green })?.green,
@@ -34,13 +34,18 @@ extension [Color.Resolved] {
 		let colorVectors = map { color in
 			return SIMD4(color.linearRed, color.linearGreen, color.linearBlue, color.opacity)
 		}
-		let clusters = colorVectors.kMeansClusters(upTo: resultCount, convergeDistance: totalDistance / 100)
+		let clusters = colorVectors.kMeansClusters(upTo: resultCount, convergeDistance: totalDistance / 100, using: &generator)
 		
 		return clusters.sorted(by: { $0.points.count > $1.points.count }).map { cluster in
 			let closestColorToCenter = cluster.points.min(by: { distanceSquared($0, cluster.center) < distanceSquared($1, cluster.center) }) ?? cluster.center
 //			let closestColorToCenter = cluster.center
 			return Color.Resolved(colorSpace: .sRGBLinear, red: closestColorToCenter[0], green: closestColorToCenter[1], blue: closestColorToCenter[2], opacity: closestColorToCenter[3])
 		}
+	}
+	
+	func getPalette(count resultCount: Int = 4) -> [Color.Resolved] {
+		var generator = SystemRandomNumberGenerator()
+		return getPalette(count: count, using: &generator)
 	}
 }
 
