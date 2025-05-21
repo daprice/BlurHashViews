@@ -20,7 +20,7 @@ public enum BlurHashParsingDetailLevel: Hashable, Codable, Sendable, Equatable {
 	public static let simple: BlurHashParsingDetailLevel = .vertices(width: 2, height: 2)
 }
 
-@available(iOS 18, tvOS 18, visionOS 2, macOS 15, watchOS 11, macCatalyst 13, *)
+@available(iOS 18, tvOS 18, visionOS 2, macOS 15, watchOS 11, macCatalyst 18, *)
 extension MeshGradient {
 	
 	/// Stores the colors and points for creating a `MeshGradient`.
