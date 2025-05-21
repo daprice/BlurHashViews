@@ -9,8 +9,7 @@ import SwiftUI
 import SwiftKMeansPlusPlus
 import simd
 
-@available(iOS 17.0, *)
-@available(iOS 17, tvOS 17, visionOS 1, macOS 14, watchOS 10, macCatalyst 13, *)
+@available(iOS 17, tvOS 17, visionOS 1, macOS 14, watchOS 10, macCatalyst 17, *)
 extension [Color.Resolved] {
 	func getPalette<R: RandomNumberGenerator>(count resultCount: Int = 4, using generator: inout R) -> [Color.Resolved] {
 		guard let minRed = self.min(by: { $0.red < $1.red })?.red,
