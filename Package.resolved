@@ -1,0 +1,24 @@
+{
+  "originHash" : "04b86f10fbf102d2f64de30ee105f190e31b9e8f923e4e023b5ce6aecd449e0a",
+  "pins" : [
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "c1805596154bb3a265fd91b8ac0c4433b4348fb0",
+        "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "swiftkmeansplusplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daprice/SwiftKMeansPlusPlus.git",
+      "state" : {
+        "revision" : "5f82335f004e3882c860da5b8f4a0d86bba1d7f5",
+        "version" : "1.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
