@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 18, tvOS 18, visionOS 2, macOS 15, watchOS 11, macCatalyst 13, *)
+@available(iOS 18, tvOS 18, visionOS 2, macOS 15, watchOS 11, macCatalyst 18, *)
 #Preview {
 	@Previewable @State var punch: Float = 1
 	@Previewable @State var smoothColors: Bool = true
