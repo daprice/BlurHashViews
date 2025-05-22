@@ -13,6 +13,8 @@ Open `Sources/BlurHashViews/Previews.swift` in Xcode 16 for an interactive Swift
 - Decode the BlurHash at different detail levels for more or less complex mesh gradients.
 - Adjust the smoothing and color space options provided by SwiftUI MeshGradient.
 
+![Screenshot from Xcode Previews showing color, palette, simplified mesh gradient, and full detailed mesh gradient for a variety of BlurHashes](Previews)
+
 ### Compatibility
 
 - iOS/tvOS 13+, macOS 10.15+, watchOS 6+ – Create a SwiftUI `Color` from the average of a BlurHash or generate a palette of representative `Color`s.
