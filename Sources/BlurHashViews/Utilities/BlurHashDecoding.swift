@@ -23,6 +23,44 @@
 import Foundation
 import simd
 
+/// The raw information decoded from a blurhash
+internal typealias BlurHashProperties = (
+	numX: Int,
+	numY: Int,
+	rawColors: [SIMD3<Float>]
+)
+
+internal func parse(blurHash: String, punch: Float = 1) throws -> BlurHashProperties {
+	var rawColors: [SIMD3<Float>] = []
+	let numY: Int
+	let numX: Int
+	
+	var substring = blurHash.utf8[...]
+	
+	let sizeFlag = try decode83(numCharacters: 1, from: &substring)
+	numY = (sizeFlag / 9) + 1
+	numX = (sizeFlag % 9) + 1
+	
+	let quantisedMaximumValue = try decode83(numCharacters: 1, from: &substring)
+	let maximumValue = Float(quantisedMaximumValue + 1) / 166
+	
+	let numColors = numX * numY
+	rawColors.reserveCapacity(numColors)
+	
+	let dcValue = try decode83(numCharacters: 4, from: &substring)
+	rawColors.append(decodeDC(dcValue))
+	
+	for _ in 0 ..< numColors - 1 {
+		let value = try decode83(numCharacters: 2, from: &substring)
+		rawColors.append(decodeAC(value, maximumValue: maximumValue * punch))
+	}
+	
+	/// The entire blur hash should be consumed
+	guard substring.isEmpty else { throw ParsingError() }
+	
+	return (numX, numY, rawColors)
+}
+
 internal func decodeDC(_ value: Int) -> SIMD3<Float> {
 	let intR = value >> 16
 	let intG = (value >> 8) & 255

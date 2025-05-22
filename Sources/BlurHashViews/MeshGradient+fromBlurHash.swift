@@ -52,52 +52,25 @@ extension MeshGradient {
 		///
 		/// - Parameters:
 		///   - blurHash: The BlurHash string to create a Mesh from.
-		///   - punch: Adjusts the contrast if the decoded colors. See the [BlurHash documentation](https://github.com/woltapp/blurhash#what-is-the-punch-parameter-in-some-of-these-implementations) for an explanation.
+		///   - punch: Adjusts the contrast of the decoded colors. See the [BlurHash documentation](https://github.com/woltapp/blurhash#what-is-the-punch-parameter-in-some-of-these-implementations) for an explanation.
 		///   - detail: The level of detail to decode from the BlurHash.
 		public init?(fromBlurHash blurHash: String, punch: Float = 1, detail: BlurHashParsingDetailLevel = .unchanged) {
 			typealias Point = SIMD2<Float>
 			
-			var rawColors: [SIMD3<Float>] = []
-			let numY: Int
-			let numX: Int
+			guard let (numX, numY, rawColors) = try? parse(blurHash: blurHash, punch: punch) else {
+				return nil
+			}
 
 			let yPoints: Int
 			let xPoints: Int
-
-			do {
-				var substring = blurHash.utf8[...]
-
-				let sizeFlag = try decode83(numCharacters: 1, from: &substring)
-				numY = (sizeFlag / 9) + 1
-				numX = (sizeFlag % 9) + 1
-
-				switch detail {
-				case .unchanged:
-					yPoints = numY
-					xPoints = numX
-				case .vertices(let width, let height):
-					yPoints = height
-					xPoints = width
-				}
-
-				let quantisedMaximumValue = try decode83(numCharacters: 1, from: &substring)
-				let maximumValue = Float(quantisedMaximumValue + 1) / 166
-
-				let numColors = numX * numY
-				rawColors.reserveCapacity(numColors)
-
-				let dcValue = try decode83(numCharacters: 4, from: &substring)
-				rawColors.append(decodeDC(dcValue))
-
-				for _ in 0 ..< numColors - 1 {
-					let value = try decode83(numCharacters: 2, from: &substring)
-					rawColors.append(decodeAC(value, maximumValue: maximumValue * punch))
-				}
-
-				/// The entire blur hash should be consumed
-				guard substring.isEmpty else { throw ParsingError() }
-			} catch {
-				return nil
+			
+			switch detail {
+			case .unchanged:
+				yPoints = numY
+				xPoints = numX
+			case .vertices(let width, let height):
+				yPoints = height
+				xPoints = width
 			}
 
 			let numPoints = yPoints * xPoints
@@ -105,7 +78,7 @@ extension MeshGradient {
 			var points: [Point] = []
 			points.reserveCapacity(numPoints)
 
-			var colors: [Color] = []
+			var colors: [Color.Resolved] = []
 			colors.reserveCapacity(numPoints)
 
 			for y in 0 ..< yPoints {
@@ -123,14 +96,14 @@ extension MeshGradient {
 						}
 					}
 					
-					colors.append(Color(.sRGBLinear, red: Double(rgb.x), green: Double(rgb.y), blue: Double(rgb.z)))
+					colors.append(Color.Resolved(colorSpace: .sRGBLinear, red: rgb.x, green: rgb.y, blue: rgb.z))
 				}
 			}
 			
 			self.init(
 				width: xPoints,
 				height: yPoints,
-				colors: .colors(colors),
+				colors: .resolvedColors(colors),
 				points: .points(points)
 			)
 		}

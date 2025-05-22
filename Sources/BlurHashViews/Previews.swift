@@ -12,32 +12,33 @@ import SwiftUI
 #Preview {
 	@Previewable @State var punch: Float = 1
 	@Previewable @State var smoothColors: Bool = true
+	@Previewable @State var paletteCount: Int = 5
 	@Previewable @State var colorSpace: Gradient.ColorSpace = .perceptual
 	
 	/// Example blurHashes from images shared on various Fediverse services
 	let hashes = [
-		"UCQ9_@~q%M9F%MIUIU-;t7WB%MIU_3RjRjt7",
 		"UVL3iAw4My%2F$IW#j%2Vz={spay}%s:ESxF",
-		"UrNwf#tQxuW;XRxuR*of~qs;RPofspRkofae",
-		"UGF=8e~VE4=_IdI]-nbd}i$zR*xuK,xvM{S5",
 		"UV7-]RkBkBfkVUj[bIfPSSafV@f8RNafaejb",
-		"UQD9hvi_9abbRikDxuWBE1RjkBsm4Tt7WUoz",
-		"UDAv%*9tIo-;ENRPD%og?^Vs%1tRIBR*WBRj",
 		"UUODXt4TNID$xuM{t6ofS1t5V@x]kXRkRjWC",
-		"UMAJ{7xa4oIpV?ogogWV0KR%?axas-RjR*s:",
-		"UKEee}0h4:%1xWM|-oxtIVxCx[WC~UaeE2WB",
-		"UkRL|JofxukCT#R*j[t6xajZM{oLoct7oJRj",
-		"UZDwdiNIMwozyZa$adofxvV?WCa}bbMwt8of",
 		"UYI?4%j@WojsCTj]n%j@^Nn%a}fPRpWobHj[",
 		"UbFOPuxZRls.~Bs.WCoeEmR-oIj[5DR-ocWV",
 		"UXKSkg5UofxY^OWEI;oJ^hsDNHbF}:RnxGW:",
+		"UCQ9_@~q%M9F%MIUIU-;t7WB%MIU_3RjRjt7",
 		"eqALq%WEVrkWbbt:eljEkDflRQjXo#aejtM}kXofaekDahkCaekDa~",
 		"etCs~.x]ROjsa}%%o#RiWVf6x_ogj[ofaxbIaxozogaxRkRjofozay",
 		"enE{qcRPn$t6WE%%V@NGbIof.9f5s,a#j[x^a#WVayazWsogj[oKj[",
 		"e3FFpjnNIoogxtxtM{sSxvNH01x[-:-po#~p%2IpWCxsxuR*adNHs:",
 		"eMDAfjngtStSo$W?ROV?obV?%%j[ROV@j?aJtTkDWBozRko#x^V@V?",
 		"U,KKya%2ofjY?w%2WBRk-;kCWCofRjaxayj[",
+		"UMAJ{7xa4oIpV?ogogWV0KR%?axas-RjR*s:",
+		"UrNwf#tQxuW;XRxuR*of~qs;RPofspRkofae",
+		"UGF=8e~VE4=_IdI]-nbd}i$zR*xuK,xvM{S5",
+		"UKEee}0h4:%1xWM|-oxtIVxCx[WC~UaeE2WB",
+		"UkRL|JofxukCT#R*j[t6xajZM{oLoct7oJRj",
+		"UZDwdiNIMwozyZa$adofxvV?WCa}bbMwt8of",
 		"UMD9#O%M4nWB00M{t7Rjj[ofj[ofxuofofj[",
+		"UQD9hvi_9abbRikDxuWBE1RjkBsm4Tt7WUoz",
+		"UDAv%*9tIo-;ENRPD%og?^Vs%1tRIBR*WBRj",
 		"UpEoo~slt7xZx|f6j=j[A3WCWBRkRof6a#ay",
 		"UHBM[C~pD*IV?GxtNGWBIUM{WCofIURkxut7",
 		"UqDKx~xuR+WB*0o0WDWVIVRjV@ofROs;ogj[",
@@ -95,10 +96,9 @@ import SwiftUI
 						.aspectRatio(1, contentMode: .fill)
 					
 					HStack(spacing: 0) {
-						let palette = try! unchangedMesh.getPalette(count: 3, resolvingColorsIn: EnvironmentValues())
-						ForEach(palette, id: \.self) { color in
-							Rectangle()
-								.fill(color)
+						let palette = Color.generatePalette(count: paletteCount, fromBlurHash: hash, punch: punch)
+						ForEach(palette ?? [], id: \.self) { color in
+							color
 						}
 					}
 					
@@ -130,6 +130,8 @@ import SwiftUI
 				Text("Punch")
 			}
 			
+			Stepper("Palette Size", value: $paletteCount, in: 2...10)
+			
 			Toggle("Smooth Colors", isOn: $smoothColors)
 			
 			Picker("Gradient Color Space", selection: $colorSpace) {
@@ -140,7 +142,7 @@ import SwiftUI
 					.tag(Gradient.ColorSpace.perceptual)
 			}
 		}
-		.frame(height: 200)
+		.frame(height: 240)
 		.scrollContentBackground(.hidden)
 		.background(.thinMaterial)
 	}
